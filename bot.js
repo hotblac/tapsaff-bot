@@ -10,11 +10,14 @@ class EchoBot extends ActivityHandler {
         // See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
         this.onMessage(async (context, next) => {
             const city = context.activity.text;
-            let replyText = 'Unknown';
+            let replyText = 'Never heard of it. What city are you in?';
             try {
                 replyText = await tapsAffStatus(city)
                     .then(response => `It's taps ${ response } in ${ city }`)
-                    .catch(error => console.log(error.message));
+                    .catch(error => {
+                        console.log(error.message);
+                        return replyText;
+                    });
             } catch (e) {
                 console.log(e.message);
             }
