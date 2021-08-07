@@ -17,6 +17,9 @@ const { BotFrameworkAdapter } = require('botbuilder');
 // This bot's main dialog.
 const { EchoBot } = require('./bot');
 
+const { generateDirectLineToken } = require('./generateDirectLineToken');
+const { renewDirectLineToken } = require('./renewDirectLineToken');
+
 // Create HTTP server
 const server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, () => {
@@ -82,3 +85,63 @@ server.on('upgrade', (req, socket, head) => {
         await myBot.run(context);
     });
 });
+
+server.post('/directline/token', async (req, res) => {
+    const origin = req.header('origin');
+
+    if (!trustedOrigin(origin)) {
+        console.error(`403 not trusted origin: ${ origin }`);
+        return res.send(403, 'not trusted origin');
+    }
+
+    const { token } = req.query;
+
+    try {
+        if (token) {
+            res.send(await renewDirectLineToken(token), { 'Access-Control-Allow-Origin': '*' });
+        } else {
+            res.send(await generateDirectLineToken(), { 'Access-Control-Allow-Origin': '*' });
+        }
+    } catch (err) {
+        console.error(err.message);
+        res.send(500, err.message, { 'Access-Control-Allow-Origin': '*' });
+    }
+
+    const { DIRECT_LINE_SECRET } = process.env;
+
+    if (token) {
+        console.log(`Refreshing Direct Line token for ${ origin }`);
+    } else {
+        console.log(
+            `Requesting Direct Line token for ${ origin } using secret "${ DIRECT_LINE_SECRET.substr(
+                0,
+                3
+            ) }...${ DIRECT_LINE_SECRET.substr(-3) }"`
+        );
+    }
+});
+
+function trustedOrigin(origin) {
+    return (
+        !origin ||
+        /^https?:\/\/localhost([\/:]|$)/.test(origin) ||
+        /^https?:\/\/192\.168\.(0|1)\.\d{1,3}([\/:]|$)/.test(origin) ||
+        origin === 'null' || // This is for file://index.html
+        // This is for Docker tests, dotless domain
+        /^https?:\/\/[\d\w-]+([\/:]|$)/.test(origin) ||
+        /^https?:\/\/[\d\w]+\.ngrok\.io(\/|$)/.test(origin) ||
+        /^https?:\/\/webchat-playground\.azurewebsites\.net(\/|$)/.test(origin) ||
+        /^https?:\/\/webchat-playground2\.azurewebsites\.net(\/|$)/.test(origin) ||
+        /^https?:\/\/hawowebchatspeech\.blob\.core\.windows\.net(\/|$)/.test(origin) ||
+        /^https?:\/\/([\d\w]+\.)+botframework\.com(\/|$)/.test(origin) ||
+        /^https:\/\/compulim\.github\.io(\/|$)/.test(origin) ||
+        /^https:\/\/corinagum\.github\.io(\/|$)/.test(origin) ||
+        /^https:\/\/microsoft\.github\.io(\/|$)/.test(origin) ||
+        /^https:\/\/bfxwebchatfullbundle\.azurewebsites\.net(\/|$)/.test(origin) ||
+        /^https:\/\/webchattest\.blob\.core\.windows\.net(\/|$)/.test(origin) ||
+        /^https:\/\/hawo-acs-dev-appserver\.azurewebsites\.net(\/|$)/.test(origin) ||
+        // This is CodePen
+        /^https:\/\/cdpn\.io(\/|$)/.test(origin) ||
+        /^https:\/\/s\.codepen\.io(\/|$)/.test(origin)
+    );
+}
