@@ -130,18 +130,6 @@ function trustedOrigin(origin) {
         // This is for Docker tests, dotless domain
         /^https?:\/\/[\d\w-]+([\/:]|$)/.test(origin) ||
         /^https?:\/\/[\d\w]+\.ngrok\.io(\/|$)/.test(origin) ||
-        /^https?:\/\/webchat-playground\.azurewebsites\.net(\/|$)/.test(origin) ||
-        /^https?:\/\/webchat-playground2\.azurewebsites\.net(\/|$)/.test(origin) ||
-        /^https?:\/\/hawowebchatspeech\.blob\.core\.windows\.net(\/|$)/.test(origin) ||
-        /^https?:\/\/([\d\w]+\.)+botframework\.com(\/|$)/.test(origin) ||
-        /^https:\/\/compulim\.github\.io(\/|$)/.test(origin) ||
-        /^https:\/\/corinagum\.github\.io(\/|$)/.test(origin) ||
-        /^https:\/\/microsoft\.github\.io(\/|$)/.test(origin) ||
-        /^https:\/\/bfxwebchatfullbundle\.azurewebsites\.net(\/|$)/.test(origin) ||
-        /^https:\/\/webchattest\.blob\.core\.windows\.net(\/|$)/.test(origin) ||
-        /^https:\/\/hawo-acs-dev-appserver\.azurewebsites\.net(\/|$)/.test(origin) ||
-        // This is CodePen
-        /^https:\/\/cdpn\.io(\/|$)/.test(origin) ||
-        /^https:\/\/s\.codepen\.io(\/|$)/.test(origin)
+        /^https?:\/\/demo\.dontpanicblog\.co\.uk(\/|$)/.test(origin)
     );
 }
